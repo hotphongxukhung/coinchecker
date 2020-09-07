@@ -47,7 +47,7 @@ namespace CoinChecker.Crawler
 
 
 
-        public Task<string> Start(string coinType)
+        public async Task<string> Start(string coinType)
         {
             coinType = coinType.ToUpper().Replace("/", "_");
             Driver.Navigate().GoToUrl(url + "/" + coinType);
@@ -63,13 +63,15 @@ namespace CoinChecker.Crawler
                 //Console.WriteLine(value.Text);
                 //Driver.Close();
 
-                return Task.FromResult<string>(value.Text);
+                //return Task.FromResult<string>(value.Text);
+                return value.Text;
             }
             catch (WebDriverTimeoutException e)
             {
                 Driver.Close();
                 Console.WriteLine(e.Message);
-                return Task.FromResult<string>("0");
+                //return Task.FromResult<string>("0");
+                return "0";
             }
         }
 

@@ -24,9 +24,11 @@ namespace CoinChecker.Crawler
                 {
                     try
                     {
-                        string cbcString = await cbc.Start(coinType);
-                        string crcString = await crc.Start(coinType);
-                        string alcString = await alc.Start(coinType);
+                        PageResult pr = GetPageResult(coinType, cbc, crc, alc).Result;
+
+                        string cbcString = pr.cbcString;
+                        string crcString = pr.crcString;
+                        string alcString = pr.alcString;
 
                         Console.WriteLine(cbcString);
                         Console.WriteLine(crcString);
@@ -40,10 +42,10 @@ namespace CoinChecker.Crawler
                         Console.WriteLine(crcValue);
                         Console.WriteLine(alcValue);
 
-                        if(cbcValue >= crcValue * (1 + percent / 100))
+                        if (cbcValue >= crcValue * (1 + percent / 100))
                         {
                             var higherPercent = (cbcValue / crcValue - 1) * 100;
-                            SlackMessage.SendMessageToSlack(coinType + " ở CoinBene cao hơn CoinReal " + higherPercent +"%");
+                            SlackMessage.SendMessageToSlack(coinType + " ở CoinBene cao hơn CoinReal " + higherPercent + "%");
                         }
                         if (cbcValue >= alcValue * (1 + percent / 100))
                         {
@@ -87,7 +89,28 @@ namespace CoinChecker.Crawler
             });
         }
 
-        
+        public Task<PageResult> GetPageResult(string coinType, CoinBeneCrawler cbc, CoinRealCrawler crc, AppLiquidCrawler alc)
+        {
+            PageResult pr = new PageResult();
+            Task.Run(() =>
+             {
+                 var alcTask = alc.Start(coinType);
+                 var crcTask = crc.Start(coinType);
+                 var cbcTask = cbc.Start(coinType);
+                 
+                 pr.cbcString = cbcTask.Result;
+                 pr.crcString = crcTask.Result;
+                 pr.alcString = alcTask.Result;
+             });
+            return Task.FromResult(pr);
+        }
+
+        public class PageResult
+        {
+            public string cbcString { get; set; }
+            public string crcString { get; set; }
+            public string alcString { get; set; }
+        }
 
     }
 }

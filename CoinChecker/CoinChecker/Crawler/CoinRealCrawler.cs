@@ -39,7 +39,7 @@ namespace CoinChecker.Crawler
             Driver.Dispose();
         }
 
-        public Task<string> Start(string coinType)
+        public async Task<string> Start(string coinType)
         {
             var head = coinType.Split("/")[0].ToUpper();
             var tail = coinType.Split("/")[1];
@@ -61,7 +61,7 @@ namespace CoinChecker.Crawler
 
                         btn.Click();
                     }
-                    catch (WebDriverTimeoutException)
+                    catch (Exception)
                     {
 
                     }
@@ -82,7 +82,8 @@ namespace CoinChecker.Crawler
                 });
 
 
-                return Task.FromResult<string>(value.Text);
+                //return Task.FromResult<string>(value.Text);
+                return value.Text;
                 //Console.WriteLine(value.Text);
                 //Driver.Close();
 
@@ -90,7 +91,8 @@ namespace CoinChecker.Crawler
             catch (WebDriverTimeoutException e)
             {
                 Console.WriteLine(e.Message);
-                return Task.FromResult<string>("0");
+                //return Task.FromResult<string>("0");
+                return "0";
             }
         }
     }
